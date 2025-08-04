@@ -1,0 +1,112 @@
+<div class="main-content">
+  <div class="top-header">
+    <div class="header-left">
+      <button class="show-sidebar-btn" (click)="toggleSidebar.emit()">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="app-title">
+        <h1>SQL Query & Visualization Interface</h1>
+      </div>
+      <div class="status-indicator">
+        <div class="status-dot online"></div>
+        <span>Online</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="header-btn" (click)="toggleFullscreen()">
+        <i class="fas fa-expand"></i>
+      </button>
+      <button class="header-btn" (click)="clearChat()">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="chat-messages" #chatMessages>
+    <div
+      class="message"
+      [class.user-message]="msg.type === 'user'"
+      [class.bot-message]="msg.type === 'bot'"
+      *ngFor="let msg of messages()"
+      @fadeInUp
+    >
+      <div class="message-avatar">
+        <i class="fas" [ngClass]="msg.type === 'user' ? 'fa-user' : msg.chart ? 'fa-chart-bar' : 'fa-database'"></i>
+      </div>
+      <div class="message-content">
+        <div class="message-bubble">
+          <div class="welcome-content" [innerHTML]="msg.content"></div>
+          <!-- Examples Container - only show in first welcome message -->
+          <div class="examples-container" *ngIf="msg.type === 'bot' && !msg.chart && messages().indexOf(msg) === 0">
+            <div class="examples-header">
+              <span class="examples-title">Try these examples:</span>
+            </div>
+            <div class="examples-list">
+              <div class="example-item">
+                <span class="example-bullet">•</span>
+                <code class="sql-example">SELECT * FROM students;</code>
+              </div>
+              <div class="example-item">
+                <span class="example-bullet">•</span>
+                <code class="sql-example">SELECT * FROM users;</code>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="msg.chart" class="chart-container-message">
+          <div class="chart-info-header">
+            <div class="chart-title-info">{{ msg.chart.title }}</div>
+            <div class="chart-meta">{{ msg.chart.values.length }} data points</div>
+          </div>
+          <div class="chart-display-small">
+            <!-- Temporarily removed plotly-plot; add back after installing angular-plotly.js -->
+            <div>Chart Placeholder </div>
+          </div>
+          <div class="chart-axis-info">
+            <div class="axis-label">
+              <i class="fas fa-arrows-alt-h"></i>
+              <span>X-Axis: {{ msg.chart.xAxis }}</span>
+            </div>
+            <div class="axis-label">
+              <i class="fas fa-arrows-alt-v"></i>
+              <span>Y-Axis: {{ msg.chart.yAxis }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="message-time">{{ msg.time }}</div>
+      </div>
+    </div>
+  </div>
+
+  <app-chart-selection 
+    *ngIf="showChartSelection()" 
+    [chartSuggestions]="chartSuggestions()"
+    (selectChart)="createChart($event)">
+  </app-chart-selection>
+
+  <div class="chat-input-container">
+    <div class="input-wrapper">
+      <div class="input-field">
+        <input
+          type="text"
+          [ngModel]="inputMessage()"
+          (ngModelChange)="inputMessage.set($event)"
+          placeholder="Enter your SQL query (e.g., SELECT * FROM table_name)"
+          (keypress)="($event.key === 'Enter' && !$event.shiftKey) ? sendMessage() : null"
+        />
+        <button class="voice-btn" [class.listening]="isListening()" (click)="toggleVoiceInput()">
+          <i class="fas fa-microphone"></i>
+        </button>
+      </div>
+      <button class="send-btn" [disabled]="!inputMessage().trim()" (click)="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+    <div class="input-hints">
+      <span>💡 Enter a SQL query to fetch data, then choose your visualization type</span>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <app-loading-overlay [isActive]="isLoading()" [message]="loadingMessage()" [progress]="loadingProgress()"></app-loading-overlay>
+</div>

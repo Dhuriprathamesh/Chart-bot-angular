@@ -1,0 +1,70 @@
+<div class="sidebar">
+  <div class="sidebar-inner">
+    <div class="logo-container">
+      <i class="fas fa-database logo-icon"></i>
+      <h1 class="logo-text">ChartBot SQL</h1>
+      <button class="sidebar-toggle-btn" (click)="toggleSidebar.emit()">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-header">
+        <span>CHATS</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">QUICK ACTIONS</h3>
+      <button class="sidebar-btn">
+        <i class="fas fa-file-export"></i>
+        <span class="btn-text">Export</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <h3 class="sidebar-title">SQL EXAMPLES</h3>
+      <div class="sql-examples">
+        <button
+          class="sql-example-btn"
+          *ngFor="let example of exampleQueries"
+          (click)="selectExampleQuery(example.query)"
+        >
+          <i class="fas fa-table"></i>
+          <span>{{ example.label }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-header">
+        <h3 class="sidebar-title">QUERY HISTORY</h3>
+        <button class="clear-history" (click)="clearHistory()">Clear</button>
+      </div>
+      <div class="history-list">
+        <div class="empty-history" *ngIf="!history.length">
+          <i class="fas fa-history"></i>
+          <span>No query history yet</span>
+        </div>
+        <div
+          class="history-item"
+          *ngFor="let item of history"
+          [title]="item.fullQuery"
+          (click)="selectedQuery.set(item.fullQuery)"
+        >
+          <i class="fas fa-{{ item.type === 'sql' ? 'database' : 'chart-bar' }}"></i>
+          <span>{{ item.query }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="database-status">
+        <div class="status-indicator">
+          <div class="status-dot online"></div>
+          <span>PostgreSQL Connected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,40 @@
+<div class="modal" [class.active]="isOpen()" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Export Chart</h3>
+      <button class="modal-close" (click)="close()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="export-options">
+        <button
+          class="export-option"
+          [class.active]="selectedFormat() === format"
+          *ngFor="let format of ['png', 'svg', 'pdf', 'json']"
+          (click)="selectFormat(format)"
+          [attr.data-format]="format"
+        >
+          <i class="fas fa-{{ format === 'png' ? 'image' : format === 'svg' ? 'file-code' : format === 'pdf' ? 'file-pdf' : 'code' }}"></i>
+          <span>{{ format.toUpperCase() }} {{ format === 'svg' ? 'Vector' : format === 'json' ? 'Data' : format === 'pdf' ? 'Document' : 'Image' }}</span>
+        </button>
+      </div>
+      <div class="export-settings">
+        <div class="setting-group">
+          <label for="export-width">Width:</label>
+          <input type="number" [(ngModel)]="exportWidthValue" (ngModelChange)="updateExportWidth()" min="100" max="2000" />
+        </div>
+        <div class="setting-group">
+          <label for="export-height">Height:</label>
+          <input type="number" [(ngModel)]="exportHeightValue" (ngModelChange)="updateExportHeight()" min="100" max="2000" />
+        </div>
+        <div class="setting-group">
+          <label for="export-filename">Filename:</label>
+          <input type="text" [(ngModel)]="exportFilenameValue" (ngModelChange)="updateExportFilename()" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="exportChart()">Export</button>
+    </div>
+  </div>
+</div>

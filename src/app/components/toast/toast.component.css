@@ -1,0 +1,46 @@
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--dark-card);
+  color: var(--dark-text);
+  padding: 16px 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: var(--transition);
+  border-left: 4px solid var(--primary-color);
+  max-width: 350px;
+  border: 1px solid var(--dark-border);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast i {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.toast.success {
+  border-left-color: var(--success-color);
+}
+
+.toast.success i {
+  color: var(--success-color);
+}
+
+.toast.error {
+  border-left-color: var(--danger-color);
+}
+
+.toast.error i {
+  color: var(--danger-color);
+}

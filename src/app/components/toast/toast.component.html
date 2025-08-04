@@ -1,0 +1,4 @@
+<div class="toast" [class.show]="toast()" [class]="toast()?.type" *ngIf="toast()">
+  <i class="fas fa-{{ toast()?.type === 'info' ? 'info-circle' : toast()?.type === 'success' ? 'check-circle' : toast()?.type === 'error' ? 'exclamation-circle' : 'exclamation-triangle' }}"></i>
+  <span>{{ toast()?.message }}</span>
+</div>
