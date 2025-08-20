@@ -68,6 +68,19 @@ body.light-theme {
   color: var(--light-text);
 }
 
+body.pro-theme {
+  background: linear-gradient(135deg, #1e293b 0%, #06b6d4 100%);
+  color: #fff;
+  box-shadow: 0 0 40px 0 #06b6d4 inset;
+  transition: var(--transition);
+}
+
+body.dark-theme {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+  transition: var(--transition);
+}
+
 /* Loading Animations */
 @keyframes fadeInUp {
   from {
@@ -176,4 +189,25 @@ button, input, .sidebar-btn, .sql-example-btn, .history-item {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Or your main layout CSS file */
+.app-layout {
+  display: flex;
+  height: 100vh;
+}
+
+app-sidebar {
+  width: 300px; /* or your sidebar width */
+  transition: width 0.3s;
+}
+
+.main-content {
+  flex: 1;
+  transition: width 0.3s;
+}
+
+.main-content.full-width {
+  width: 100vw;
+  max-width: 100vw;
 }

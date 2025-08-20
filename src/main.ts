@@ -1,27 +1,31 @@
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import { PlotlyModule } from 'angular-plotly.js';
+import { appConfig } from './app/app.config';
 
-// Configure PlotlyJS synchronously before bootstrapping
-async function configurePlotlyAndBootstrap() {
-  try {
-    // Try to import PlotlyJS
-    const PlotlyJS = await import('plotly.js-dist/plotly.js');
-    const Plotly = PlotlyJS.default || PlotlyJS;
-    
-    // Set PlotlyJS for angular-plotly.js
-    (PlotlyModule as any).plotlyjs = Plotly;
-    console.log('PlotlyJS configured successfully');
-    
-    // Bootstrap Angular after PlotlyJS is configured
-    bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
-  } catch (error) {
-    console.error('Failed to load PlotlyJS:', error);
-    // Bootstrap without PlotlyJS if it fails to load
-    bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err));
-  }
+function configurePlotlyAndBootstrap() {
+  const script = document.createElement('script');
+  script.src = 'https://cdn.plot.ly/plotly-2.27.0.min.js';
+  script.type = 'text/javascript';
+  script.async = true;
+
+  script.onload = () => {
+    const plotly = (window as any).Plotly;
+    if (plotly) {
+      console.log('✅ PlotlyJS loaded from CDN');
+
+      // No need to provide anything — use window.Plotly in your component
+      bootstrapApplication(AppComponent, appConfig)
+        .catch(err => console.error('Bootstrap error:', err));
+    } else {
+      console.error('❌ Plotly not found on window object');
+    }
+  };
+
+  script.onerror = () => {
+    console.error('❌ Failed to load PlotlyJS from CDN');
+  };
+
+  document.head.appendChild(script);
 }
 
-// Start the configuration process
 configurePlotlyAndBootstrap();

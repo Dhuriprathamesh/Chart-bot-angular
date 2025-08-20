@@ -5,7 +5,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+  z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,10 +25,13 @@
   box-shadow: var(--box-shadow);
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
   transform: translateY(-20px);
   transition: var(--transition);
   overflow: hidden;
   border: 1px solid var(--dark-border);
+  display: flex;
+  flex-direction: column;
 }
 
 .modal.active .modal-content {
@@ -41,11 +44,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background-color: var(--dark-card);
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
   font-size: 18px;
   font-weight: 500;
+  color: aliceblue;
 }
 
 .modal-close {
@@ -69,73 +75,163 @@
 
 .modal-body {
   padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(90vh - 140px); /* Account for header and footer */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) transparent;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
 }
 
 .export-options {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 25px;
 }
 
 .export-option {
   background-color: var(--dark-bg);
   border: 1px solid var(--dark-border);
   border-radius: var(--border-radius-sm);
-  padding: 15px;
+  padding: 18px 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: var(--transition);
+  min-height: 100px;
 }
 
-.export-option:hover {
+.export-option:hover:not(:disabled) {
   border-color: var(--primary-color);
   background-color: rgba(110, 72, 170, 0.1);
+  transform: translateY(-2px);
 }
 
 .export-option.active {
   border-color: var(--primary-color);
   background-color: rgba(110, 72, 170, 0.2);
+  box-shadow: 0 4px 12px rgba(110, 72, 170, 0.3);
+}
+
+.export-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .export-option i {
-  font-size: 24px;
+  font-size: 28px;
   color: var(--primary-color);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
-.export-option span {
-  font-size: 13px;
+.format-name {
+  font-size: 14px;
+  font-weight: 600;
   color: var(--dark-text);
+  margin-bottom: 4px;
+}
+
+.format-desc {
+  font-size: 11px;
+  color: var(--dark-text-secondary);
+  text-align: center;
+  line-height: 1.3;
 }
 
 .export-settings {
+  border-top: 1px solid var(--dark-border);
+  padding-top: 20px;
+}
+
+.export-settings h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark-text);
+  margin-bottom: 15px;
+}
+
+.settings-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 15px;
 }
 
+.setting-group.full-width {
+  grid-column: 1 / -1;
+}
+
 .setting-group {
-  margin-bottom: 15px;
+  margin-bottom: 0;
 }
 
 .setting-group label {
   display: block;
   font-size: 12px;
   color: var(--dark-text-secondary);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .setting-group input {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 12px;
   background-color: var(--dark-bg);
   border: 1px solid var(--dark-border);
   border-radius: var(--border-radius-sm);
   color: var(--dark-text);
   font-size: 14px;
+  transition: var(--transition);
+}
+
+.setting-group input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(110, 72, 170, 0.2);
+  outline: none;
+}
+
+.setting-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--dark-border);
+}
+
+.btn-primary:disabled:hover {
+  background-color: var(--dark-border);
+  transform: none;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary i {
+  margin-right: 8px;
 }
 
 .modal-footer {
@@ -144,6 +240,8 @@
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  background-color: var(--dark-card);
+  flex-shrink: 0;
 }
 
 .btn-secondary {
@@ -154,9 +252,10 @@
   color: var(--dark-text);
   font-size: 14px;
   cursor: pointer;
+  transition: var(--transition);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
@@ -169,8 +268,71 @@
   color: white;
   font-size: 14px;
   cursor: pointer;
+  transition: var(--transition);
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: var(--primary-dark);
+  transform: translateY(-1px);
 }
+
+/* Responsive adjustments */
+@media (max-height: 600px) {
+  .modal-content {
+    max-height: 95vh;
+  }
+  
+  .modal-body {
+    max-height: calc(95vh - 120px);
+  }
+  
+  .export-options {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .export-option {
+    padding: 12px 10px;
+    min-height: 80px;
+  }
+  
+  .export-option i {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  
+  .format-name {
+    font-size: 13px;
+  }
+  
+  .format-desc {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .modal-body {
+    padding: 15px;
+    max-height: calc(95vh - 120px);
+  }
+  
+  .export-options {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .modal-footer {
+    padding: 12px 15px;
+  }
+}
+

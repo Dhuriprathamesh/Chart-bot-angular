@@ -1,5 +1,34 @@
+/* Theme buttons in sidebar footer */
+.theme-btn {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  box-shadow: var(--shadow-primary);
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+}
+
+.theme-btn.active {
+  background: var(--gradient-secondary);
+  box-shadow: 0 0 12px 2px var(--primary-color);
+  border: 2px solid var(--accent-color);
+}
+
+.theme-btn:active {
+  transform: scale(0.95);
+}
+
+/* Sidebar Container */
 .sidebar {
-  width: var(--sidebar-width);
+  width: var(--sidebar-width, 280px);
   background: var(--gradient-dark);
   display: flex;
   flex-direction: column;
@@ -13,6 +42,13 @@
   max-height: 100vh;
 }
 
+.sidebar.hidden {
+  width: 0;
+  padding: 0;
+  border-right: none;
+}
+
+/* Sidebar Inner Content */
 .sidebar-inner {
   display: flex;
   flex-direction: column;
@@ -42,6 +78,7 @@
   background: var(--primary-light);
 }
 
+/* Logo Container */
 .logo-container {
   display: flex;
   align-items: center;
@@ -69,6 +106,7 @@
   letter-spacing: -0.5px;
 }
 
+/* Sidebar Toggle Button */
 .sidebar-toggle-btn {
   position: absolute;
   right: 15px;
@@ -93,6 +131,7 @@
   box-shadow: var(--shadow-primary);
 }
 
+/* Sidebar Sections */
 .sidebar-section {
   padding: 25px 20px;
   border-bottom: 1px solid var(--dark-border);
@@ -114,6 +153,7 @@
   font-weight: 600;
 }
 
+/* Clear History Button */
 .clear-history {
   background: none;
   border: none;
@@ -130,12 +170,13 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+/* General Sidebar Buttons */
 .sidebar-btn {
   width: 100%;
   padding: 14px 18px;
   background-color: transparent;
   border: none;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-sm, 8px);
   color: var(--dark-text);
   font-size: 14px;
   font-weight: 500;
@@ -161,6 +202,7 @@
   color: var(--primary-color);
 }
 
+/* SQL Examples */
 .sql-examples {
   display: flex;
   flex-direction: column;
@@ -172,7 +214,7 @@
   padding: 12px 15px;
   background: rgba(99, 102, 241, 0.1);
   border: 1px solid var(--dark-border);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-sm, 8px);
   color: var(--dark-text);
   font-size: 13px;
   display: flex;
@@ -201,6 +243,7 @@
   font-weight: 500;
 }
 
+/* Query History */
 .history-list {
   max-height: 220px;
   overflow-y: auto;
@@ -211,7 +254,7 @@
 .history-item {
   padding: 12px 15px;
   margin-bottom: 8px;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-sm, 8px);
   font-size: 13px;
   cursor: pointer;
   display: flex;
@@ -236,6 +279,16 @@
   min-width: 18px;
 }
 
+.history-item.empty-history {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.empty-history i {
+  margin-right: 10px;
+}
+
+/* Sidebar Footer */
 .sidebar-footer {
   margin-top: auto;
   padding: 25px 20px 40px 20px;
@@ -267,7 +320,178 @@
   box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
 }
 
-/* Responsive adjustments for sidebar bottom padding */
+/* New Chat Button */
+.new-chat-btn {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.new-chat-btn:hover:not(:disabled) {
+  background: var(--gradient-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-primary);
+}
+
+.new-chat-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Chat Sessions List */
+.chat-sessions-list {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--dark-card);
+}
+
+.chat-sessions-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-sessions-list::-webkit-scrollbar-track {
+  background: var(--dark-card);
+  border-radius: 2px;
+}
+
+.chat-sessions-list::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+.loading-sessions,
+.empty-sessions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  color: var(--dark-text-secondary);
+  text-align: center;
+}
+
+.loading-sessions i,
+.empty-sessions i {
+  font-size: 24px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.empty-sessions small {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+/* Chat Session Items */
+.chat-session-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--dark-card);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-session-item:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--primary-color);
+  transform: translateX(2px);
+}
+
+.chat-session-item.active {
+  background: var(--gradient-primary);
+  border-color: var(--accent-color);
+  box-shadow: var(--shadow-primary);
+}
+
+.chat-session-item.active .session-title {
+  color: white;
+  font-weight: 600;
+}
+
+.chat-session-item.active .session-meta {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dark-text-primary);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--dark-text-secondary);
+}
+
+.message-count {
+  opacity: 0.8;
+}
+
+.session-time {
+  opacity: 0.6;
+}
+
+.delete-session-btn {
+  background: none;
+  border: none;
+  color: var(--dark-text-secondary);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: var(--transition);
+  font-size: 12px;
+}
+
+.chat-session-item:hover .delete-session-btn {
+  opacity: 1;
+}
+
+.delete-session-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.chat-session-item.active .delete-session-btn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.chat-session-item.active .delete-session-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
   .sidebar {
     padding-bottom: 100px;
@@ -275,6 +499,12 @@
   
   .sidebar-footer {
     padding: 25px 20px 30px 20px;
+  }
+
+  .sidebar-btn,
+  .sql-example-btn {
+    font-size: 13px;
+    padding: 12px 15px;
   }
 }
 
@@ -285,5 +515,35 @@
   
   .sidebar-footer {
     padding: 20px 15px 25px 15px;
+  }
+
+  .logo-text {
+    font-size: 18px;
+  }
+
+  .sidebar-btn,
+  .sql-example-btn {
+    font-size: 12px;
+    padding: 10px 12px;
+  }
+
+  .sidebar-title {
+    font-size: 12px;
+  }
+}
+
+/* Animation for Status Dot */
+@keyframes pulse-dot {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
   }
 }

@@ -1,6 +1,12 @@
 <div class="app-container" [class.sidebar-hidden]="sidebarHidden()">
-  <app-sidebar (toggleSidebar)="toggleSidebar()"></app-sidebar>
-  <app-chat (toggleSidebar)="toggleSidebar()"></app-chat>
+  <app-sidebar 
+    #sidebarComponent
+    (toggleSidebar)="toggleSidebar()" 
+    (exportChart)="onExportChart()"
+    (newChatCreated)="onNewChatCreated($event)"
+    (sessionSwitched)="onSessionSwitched($event)">
+  </app-sidebar>
+  <app-chat (toggleSidebar)="toggleSidebar()" #chatComponent></app-chat>
   <app-loading-overlay></app-loading-overlay>
   <app-toast></app-toast>
   <app-export-modal></app-export-modal>

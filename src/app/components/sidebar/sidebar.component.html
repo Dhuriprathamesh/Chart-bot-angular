@@ -9,14 +9,53 @@
     </div>
 
     <div class="sidebar-section">
-      <div class="sidebar-header">
-        <span>CHATS</span>
+      <div class="section-header">
+        <h3 class="sidebar-title">CHATS</h3>
+        <button class="new-chat-btn" (click)="createNewChat()" [disabled]="isLoadingSessions()">
+          <i class="fas fa-plus"></i>
+          <span>New Chat</span>
+        </button>
+      </div>
+      
+      <div class="chat-sessions-list">
+        <div class="loading-sessions" *ngIf="isLoadingSessions()">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Loading chats...</span>
+        </div>
+        
+        <div class="empty-sessions" *ngIf="!isLoadingSessions() && chatSessions().length === 0">
+          <i class="fas fa-comments"></i>
+          <span>No chat sessions yet</span>
+          <small>Click "New Chat" to start</small>
+        </div>
+        
+        <div
+          class="chat-session-item"
+          *ngFor="let session of chatSessions()"
+          [class.active]="currentSessionId() === session.id"
+          (click)="switchToSession(session.id)"
+        >
+          <div class="session-info">
+            <div class="session-title">{{ session.title }}</div>
+            <div class="session-meta">
+              <span class="message-count">{{ session.message_count }} messages</span>
+              <span class="session-time">{{ formatSessionTime(session.updated_at) }}</span>
+            </div>
+          </div>
+          <button 
+            class="delete-session-btn" 
+            (click)="deleteSession(session.id, $event)"
+            title="Delete chat session"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
       </div>
     </div>
 
     <div class="sidebar-section">
       <h3 class="sidebar-title">QUICK ACTIONS</h3>
-      <button class="sidebar-btn">
+      <button class="sidebar-btn" (click)="onExportClick()">
         <i class="fas fa-file-export"></i>
         <span class="btn-text">Export</span>
       </button>
@@ -42,7 +81,7 @@
         <button class="clear-history" (click)="clearHistory()">Clear</button>
       </div>
       <div class="history-list">
-        <div class="empty-history" *ngIf="!history.length">
+        <div class="empty-history" *ngIf="history.length === 0">
           <i class="fas fa-history"></i>
           <span>No query history yet</span>
         </div>

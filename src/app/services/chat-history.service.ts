@@ -1,94 +1,61 @@
 import { Injectable, signal } from '@angular/core';
-import { SupabaseService, ChatMessage, ChatSession } from './supabase.service'; // Ensure ChatSession is imported
+import { SupabaseService, ChatMessage, ChatSession } from './supabase.service';
 import { ToastService } from './toast.service';
 
-interface HistoryItem {
-  id: number;
-  query: string;
-  fullQuery: string;
-  type: 'sql' | 'chart';
-  timestamp: string;
+// Define a type for the message input that allows optional session_id
+interface SaveChatMessageInput {
+  type: 'user' | 'bot';
+  content: string;
+  chart?: any;
+  time: string;
+  session_id?: string; // Optional at input
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class HistoryService {
-  private history = signal<HistoryItem[]>(JSON.parse(localStorage.getItem('queryHistory') || '[]'));
+export class ChatHistoryService {
   private chatHistory = signal<ChatMessage[]>([]);
   private chatSessions = signal<ChatSession[]>([]);
-  private isLoadingChat = signal<boolean>(false);
+  private isLoading = signal<boolean>(false);
 
   constructor(
     private supabaseService: SupabaseService,
     private toastService: ToastService
   ) {}
 
-  // ===== EXISTING QUERY HISTORY FUNCTIONALITY =====
-  getHistory(): HistoryItem[] {
-    return this.history();
-  }
-
-  addToHistory(query: string, type: 'sql' | 'chart'): void {
-    const newItem: HistoryItem = {
-      id: Date.now(),
-      query: query.length > 40 ? query.substring(0, 40) + '...' : query,
-      fullQuery: query,
-      type,
-      timestamp: new Date().toISOString(),
-    };
-    this.history.update((items) => {
-      const updated = [newItem, ...items].slice(0, 10);
-      localStorage.setItem('queryHistory', JSON.stringify(updated));
-      return updated;
-    });
-  }
-
-  clearHistory(): void {
-    this.history.set([]);
-    localStorage.removeItem('queryHistory');
-  }
-
-  // ===== NEW CHAT HISTORY FUNCTIONALITY =====
-
-  // Get chat history signal (reactive)
+  // Expose chat history and sessions as readonly signals
   getChatHistory() {
     return this.chatHistory.asReadonly();
   }
 
-  // Get chat sessions signal (reactive)
   getChatSessions() {
     return this.chatSessions.asReadonly();
   }
 
-  // Get loading state
-  getChatLoadingState() {
-    return this.isLoadingChat.asReadonly();
+  getLoadingState() {
+    return this.isLoading.asReadonly();
   }
 
   // Load chat history for a specific session
   async loadChatHistory(sessionId?: string): Promise<ChatMessage[]> {
-    this.isLoadingChat.set(true);
+    this.isLoading.set(true);
     try {
       const messages = await this.supabaseService.getChatMessages(sessionId);
-      // Filter messages by sessionId if provided, otherwise load all
-      const filteredMessages = sessionId 
-        ? messages.filter(msg => msg.session_id === sessionId)
-        : messages;
-      this.chatHistory.set(filteredMessages);
-      return filteredMessages;
+      this.chatHistory.set(messages);
+      return messages;
     } catch (error) {
       console.error('Error loading chat history:', error);
       this.toastService.show('Failed to load chat history', 'error');
       return [];
     } finally {
-      this.isLoadingChat.set(false);
+      this.isLoading.set(false);
     }
   }
 
   // Load all chat sessions
   async loadChatSessions(): Promise<ChatSession[]> {
-    this.isLoadingChat.set(true);
+    this.isLoading.set(true);
     try {
       const sessions = await this.supabaseService.getChatSessions();
       this.chatSessions.set(sessions);
@@ -98,23 +65,40 @@ export class HistoryService {
       this.toastService.show('Failed to load chat sessions', 'error');
       return [];
     } finally {
-      this.isLoadingChat.set(false);
+      this.isLoading.set(false);
     }
   }
 
-  // Save a new chat message to Supabase with session ID
-  async saveChatMessage(message: Omit<ChatMessage, 'id' | 'created_at'>): Promise<void> {
+  // Save a message with session ID
+  async saveChatMessage(message: SaveChatMessageInput): Promise<void> {
     try {
+      let sessionId: string;
       if (!message.session_id) {
-        throw new Error('Session ID is required to save a message');
+        // Create a new session if session_id is missing
+        const newSessionId = `session_${Date.now()}`;
+        const newSession: ChatSession = {
+          id: newSessionId,
+          title: 'New Session',
+          message_count: 0,
+          updated_at: new Date().toISOString(),
+        };
+        await this.supabaseService.createChatSession(newSession);
+        sessionId = newSessionId;
+      } else {
+        sessionId = message.session_id; // Safe because of the check
       }
-      await this.supabaseService.saveChatMessage(message);
-      // Reload history only if session_id is valid
-      if (message.session_id) {
-        await this.loadChatHistory(message.session_id);
-      }
+      // Create a new message object with guaranteed session_id
+      const safeMessage: Omit<ChatMessage, 'id' | 'created_at'> = {
+        type: message.type,
+        content: message.content,
+        chart: message.chart,
+        time: message.time,
+        session_id: sessionId, // sessionId is now always a string
+      };
+      await this.supabaseService.saveChatMessage(safeMessage); // Line 153
+      await this.loadChatHistory(sessionId); // Reload history for the specific session
     } catch (error) {
-      console.error('Error saving chat message:', error);
+      console.error('Error saving message:', error);
       this.toastService.show('Failed to save message', 'error');
       throw error;
     }
@@ -149,9 +133,7 @@ export class HistoryService {
     try {
       await this.supabaseService.deleteChatSession(sessionId);
       await this.loadChatSessions(); // Refresh sessions list
-      if (this.chatHistory().some(msg => msg.session_id === sessionId)) {
-        this.chatHistory.set([]); // Clear history if it belongs to the deleted session
-      }
+      this.chatHistory.set([]); // Clear history if current session is deleted
     } catch (error) {
       console.error('Error deleting chat session:', error);
       this.toastService.show('Failed to delete chat session', 'error');
@@ -159,8 +141,8 @@ export class HistoryService {
     }
   }
 
-  // Delete a chat message
-  async deleteChatMessage(id: number): Promise<void> {
+  // Delete a specific message
+  async deleteMessage(id: number): Promise<void> {
     try {
       await this.supabaseService.deleteChatMessage(id);
       const currentHistory = this.chatHistory();
@@ -173,12 +155,14 @@ export class HistoryService {
     }
   }
 
-  // Clear all chat history
-  async clearAllChatHistory(): Promise<void> {
+  // Clear all chat history and sessions
+  async clearAllHistory(): Promise<void> {
     try {
       await this.supabaseService.clearChatHistory();
+      await this.supabaseService.clearChatSessions(); // Assuming this method exists
       this.chatHistory.set([]);
-      this.toastService.show('Chat history cleared', 'success');
+      this.chatSessions.set([]);
+      this.toastService.show('Chat history and sessions cleared', 'success');
     } catch (error) {
       console.error('Error clearing chat history:', error);
       this.toastService.show('Failed to clear chat history', 'error');
@@ -186,25 +170,19 @@ export class HistoryService {
     }
   }
 
-  // Add message to local chat state (for immediate UI update)
-  addChatMessageToLocal(message: ChatMessage): void {
+  // Add message to local state (for immediate UI updates)
+  addMessageToLocal(message: ChatMessage): void {
     const currentHistory = this.chatHistory();
     this.chatHistory.set([...currentHistory, message]);
   }
 
-  // Update local chat message (useful for updating bot responses with charts)
-  updateLocalChatMessage(index: number, updatedMessage: Partial<ChatMessage>): void {
+  // Update local message
+  updateLocalMessage(index: number, updatedMessage: Partial<ChatMessage>): void {
     const currentHistory = this.chatHistory();
     if (index >= 0 && index < currentHistory.length) {
       const updated = [...currentHistory];
       updated[index] = { ...updated[index], ...updatedMessage };
       this.chatHistory.set(updated);
     }
-  }
-
-  // Clear both query history and chat history
-  async clearAllHistory(): Promise<void> {
-    this.clearHistory(); // Clear query history (localStorage)
-    await this.clearAllChatHistory(); // Clear chat history (Supabase)
   }
 }

@@ -1,9 +1,7 @@
-declare module 'plotly.js-dist' {
-  const Plotly: any;
-  export = Plotly;
+declare global {
+  interface Window {
+    Plotly: any;
+  }
 }
 
-declare module 'plotly.js-dist/plotly.js' {
-  const Plotly: any;
-  export default Plotly;
-} 
+export {};

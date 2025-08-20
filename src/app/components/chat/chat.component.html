@@ -59,8 +59,7 @@
             <div class="chart-meta">{{ msg.chart.values.length }} data points</div>
           </div>
           <div class="chart-display-small">
-            <!-- Temporarily removed plotly-plot; add back after installing angular-plotly.js -->
-            <div>Chart Placeholder </div>
+            <div [id]="'chart-' + messages().indexOf(msg)" class="plotly-chart"></div>
           </div>
           <div class="chart-axis-info">
             <div class="axis-label">
@@ -84,29 +83,59 @@
     (selectChart)="createChart($event)">
   </app-chart-selection>
 
-  <div class="chat-input-container">
-    <div class="input-wrapper">
-      <div class="input-field">
+  <!-- Advanced Chat Input Container -->
+  <div class="advanced-chat-input">
+    <div class="input-container">
+      <div class="input-field-wrapper" [class.loading]="isLoading()">
+        <div class="input-icon">
+          <i class="fas fa-terminal"></i>
+        </div>
         <input
           type="text"
           [ngModel]="inputMessage()"
           (ngModelChange)="inputMessage.set($event)"
-          placeholder="Enter your SQL query (e.g., SELECT * FROM table_name)"
+          placeholder="Enter your SQL query here... (e.g., SELECT * FROM users WHERE age > 25)"
           (keypress)="($event.key === 'Enter' && !$event.shiftKey) ? sendMessage() : null"
+          class="sql-input"
         />
-        <button class="voice-btn" [class.listening]="isListening()" (click)="toggleVoiceInput()">
-          <i class="fas fa-microphone"></i>
-        </button>
+        <div class="input-actions">
+          <button class="action-btn voice-btn" [class.listening]="isListening()" (click)="toggleVoiceInput()" title="Voice Input">
+            <i class="fas fa-microphone"></i>
+          </button>
+          <button class="action-btn clear-btn" (click)="clearInput()" title="Clear Input" *ngIf="inputMessage().trim()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
-      <button class="send-btn" [disabled]="!inputMessage().trim()" (click)="sendMessage()">
+      <button class="send-button" [disabled]="!inputMessage().trim()" (click)="sendMessage()" title="Send Query">
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>
-    <div class="input-hints">
-      <span>💡 Enter a SQL query to fetch data, then choose your visualization type</span>
+    
+    <div class="input-hints-container">
+      <div class="hint-item">
+        <i class="fas fa-lightbulb"></i>
+        <span>Try: SELECT * FROM students WHERE grade > 80</span>
+      </div>
+      <div class="hint-item">
+        <i class="fas fa-chart-bar"></i>
+        <span>After query, choose your visualization type</span>
+      </div>
+      <div class="hint-item">
+        <i class="fas fa-database"></i>
+        <span>Available tables: users, students, products, orders</span>
+      </div>
     </div>
   </div>
 
   <!-- Loading Overlay -->
   <app-loading-overlay [isActive]="isLoading()" [message]="loadingMessage()" [progress]="loadingProgress()"></app-loading-overlay>
+
+  <!-- Export Modal -->
+  <app-export-modal 
+    #exportModal
+    [chartData]="currentChart()"
+    (exportComplete)="onExportComplete()"
+    (exportError)="onExportError($event)">
+  </app-export-modal>
 </div>

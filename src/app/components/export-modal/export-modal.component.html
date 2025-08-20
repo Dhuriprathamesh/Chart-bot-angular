@@ -12,29 +12,63 @@
           *ngFor="let format of ['png', 'svg', 'pdf', 'json']"
           (click)="selectFormat(format)"
           [attr.data-format]="format"
+          [disabled]="isExporting()"
         >
           <i class="fas fa-{{ format === 'png' ? 'image' : format === 'svg' ? 'file-code' : format === 'pdf' ? 'file-pdf' : 'code' }}"></i>
-          <span>{{ format.toUpperCase() }} {{ format === 'svg' ? 'Vector' : format === 'json' ? 'Data' : format === 'pdf' ? 'Document' : 'Image' }}</span>
+          <span class="format-name">{{ format.toUpperCase() }}</span>
+          <span class="format-desc">{{ getFormatDescription(format) }}</span>
         </button>
       </div>
-      <div class="export-settings">
-        <div class="setting-group">
-          <label for="export-width">Width:</label>
-          <input type="number" [(ngModel)]="exportWidthValue" (ngModelChange)="updateExportWidth()" min="100" max="2000" />
-        </div>
-        <div class="setting-group">
-          <label for="export-height">Height:</label>
-          <input type="number" [(ngModel)]="exportHeightValue" (ngModelChange)="updateExportHeight()" min="100" max="2000" />
-        </div>
-        <div class="setting-group">
-          <label for="export-filename">Filename:</label>
-          <input type="text" [(ngModel)]="exportFilenameValue" (ngModelChange)="updateExportFilename()" />
+      
+      <div class="export-settings" *ngIf="selectedFormat()">
+        <h4>Export Settings</h4>
+        <div class="settings-grid">
+          <div class="setting-group">
+            <label for="export-width">Width (px):</label>
+            <input 
+              type="number" 
+              [(ngModel)]="exportWidthValue" 
+              (ngModelChange)="updateExportWidth()" 
+              min="100" 
+              max="2000" 
+              [disabled]="isExporting()"
+            />
+          </div>
+          <div class="setting-group">
+            <label for="export-height">Height (px):</label>
+            <input 
+              type="number" 
+              [(ngModel)]="exportHeightValue" 
+              (ngModelChange)="updateExportHeight()" 
+              min="100" 
+              max="2000" 
+              [disabled]="isExporting()"
+            />
+          </div>
+          <div class="setting-group full-width">
+            <label for="export-filename">Filename:</label>
+            <input 
+              type="text" 
+              [(ngModel)]="exportFilenameValue" 
+              (ngModelChange)="updateExportFilename()" 
+              [disabled]="isExporting()"
+              placeholder="Enter filename without extension"
+            />
+          </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn-secondary" (click)="close()">Cancel</button>
-      <button class="btn-primary" (click)="exportChart()">Export</button>
+      <button class="btn-secondary" (click)="close()" [disabled]="isExporting()">Cancel</button>
+      <button 
+        class="btn-primary" 
+        (click)="exportChart()" 
+        [disabled]="isExporting() || !selectedFormat()"
+      >
+        <i class="fas fa-spinner fa-spin" *ngIf="isExporting()"></i>
+        <span *ngIf="!isExporting()">Export</span>
+        <span *ngIf="isExporting()">Exporting...</span>
+      </button>
     </div>
   </div>
 </div>
