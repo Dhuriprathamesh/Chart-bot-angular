@@ -1,7 +1,7 @@
 <h2>CHAT-DRIVEN CHARTING BOT USING FLASK AND PLOTLY IN WEB APP</h2>
 
 Overview:
-This project is an AI-driven chatbot integrated with a Flask backend and an HTML, CSS, JS 
+This project is an AI-driven chatbot integrated with a Flask backend and an Angular with Typescript
 frontend. 
 It allows users to request data visualizations (like pie charts, bar graphs, etc.) through 
 natural language. 
